@@ -89,11 +89,11 @@ class Open_and_Plot_Picture:
 
         def array_of_spectrum(self):
 
-            for x in range(0, len(self.x_axis_in_nm)-1):
+            for x in range(0, len(self.x_axis_in_nm)):
                 self.result_array[x,0] = self.x_axis_in_nm[x]
                 self.result_array[x,1] = self.integrated[x]
 
-            print(self.result_array)
+            #print(self.result_array)
 
 
 

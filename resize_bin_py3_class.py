@@ -108,11 +108,47 @@ class resize_bins:
         self.delta_bin = float
         self.case = bool
         self.test = np.zeros([len(self.initial_array),1])
-       # print(self.test)
+
         self.error_switch = True
         self.restmatrix = np.array
         self.result_matrix = np.array
         self.filename = filename
+
+        self.order_ascending()
+
+
+
+    def order_ascending(self):
+
+        self.initial_array.view('i8,i8').sort(order=['f0'], axis=0)
+
+        self.copy_initial.view('i8,i8').sort(order=['f0'], axis=0)
+
+        return self.initial_array
+
+
+
+
+    def find_digit_and_round(self, number):
+
+        x = 0
+        first_digit = number
+        if first_digit >1:
+            print("first digit 0.", x, "times" )
+            return None
+
+        else:
+
+            while first_digit <1:
+
+                first_digit = first_digit*10
+                x = x+1
+        return x
+
+
+
+
+
 
 
 
@@ -121,9 +157,11 @@ class resize_bins:
 
         #N = len(self.initial_array)
 
-        minsize = self.result_binsize
+
 
         i = 0
+
+        error_switch = True
         while i < len(self.initial_array)-2:
 
             self.test[i] = self.initial_array[i+1,0]-self.initial_array[i,0]
@@ -132,23 +170,52 @@ class resize_bins:
 
 
 
+
         for x in range (0, len(self.test)-1):
 
             if self.test[x] >   self.result_binsize:
-                error_switch = True
+                error_switch = False
 
-                print ("binsize too small")
+                #print ("binsize too small")
+
+
+
+
 
 
             else:
-                error_switch = False
+                self.result_binsize = self.result_binsize
+
+        if error_switch == False:
+
+                print("resulting binsize must be > than maximum binsize in array")
+
+                print("resulting binsize is set to minimum possible value with")
+                print("accuracy of 1 digit")
+
+
+                possible_binsize = np.amax(self.test, axis = 0)
+
+                #print(np.amax(self.test, axis = 0))
+
+                digit = self.find_digit_and_round(float(possible_binsize))
+
+                self.result_binsize = round(float(possible_binsize),digit)
+
+                #print(self.result_binsize)
+
+                #error_switch = True
+
+        else:
+            self.result_binsize = self.result_binsize
+
+        print(self.result_binsize)
+        return self.result_binsize
 
 
 
 
 
-        possible_binsize = np.amax(self.test, axis = 0)
-        #print(np.amin(test, axis=0), 'minimum')
 
         if error_switch == True:
 
@@ -183,11 +250,11 @@ class resize_bins:
 
         x = repr(self.result_binsize)
 
-        print(x, "davor")
+        #print(x, "davor")
 
         x = len(str(x).split(".")[1])
 
-        print(x, "watn das?")
+
 
         first_element=self.initial_array[0,0]
 
@@ -367,9 +434,9 @@ class resize_bins:
 
 
 
-    def print_to_file(self):
+    def print_to_file(self, filename):
         #print ("now to file")
-        np.savetxt(filename +"_"+ repr(self.result_binsize)+".txt", self.result_matrix[:], fmt='%.3E', delimiter='\t')
+        np.savetxt(filename +"_"+"bin_size"+ repr(self.result_binsize)+".txt", self.result_matrix, fmt='%.3E', delimiter='\t')
 
 
 

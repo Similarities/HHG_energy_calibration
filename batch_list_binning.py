@@ -13,6 +13,7 @@ save_path = "results/"
 tif_files = []
 counter = 0
 
+
 for file in os.listdir(path_picture):
     try:
 
@@ -40,6 +41,9 @@ class batch_images_to_txt:
         self.number = len(liste)
         self.numerator = 0
         self.my_array = np.zeros([2048,2])
+        self.filename = str
+        self.result_binsize = 0.00001
+        self.result_binned_array = np.array
 
     def open_and_integrate(self):
         for x in range (0, self.number-1):
@@ -51,10 +55,26 @@ class batch_images_to_txt:
             my_picture.background()
             self.my_array = my_picture.grating_function()
 
+            self.filename = str(self.liste[self.numerator - x])[:-4]
+            print(self.filename)
+
             #my_picture.plot_HHG_800nm()
 
 
             #np.savetxt(self.liste[self.numerator - x]+".txt", my_array, delimiter=' ', fmt='%1.4e')   # use exponential notation
+            from resize_bin_py3_class import resize_bins
+
+            my_binned_spectrum = resize_bins(self.my_array,self.result_binsize, self.filename )
+            self.result_binsize = my_binned_spectrum.minimum_bin()
+            my_binned_spectrum.minimum_bin()
+            self.result_binned_array = my_binned_spectrum.shrink_subarray()
+
+            #resize_me.plot_array()
+            my_binned_spectrum.print_to_file(self.filename)
+            #np.savetxt(self.filename +"_"+ str(self.result_binsize)+".txt", self.result_binned_array, fmt='%.3E', delimiter='\t')
+
+
+
 
 
            # self.integrated[i,0] = f(x)*self.integrated[i,0]
