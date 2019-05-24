@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on Wed Sep 27 09:59:57 2017
+Created on 22 May 09:59:57 2019
 
 @author: similarities
 """
@@ -14,83 +14,6 @@ import os
 
 import ntpath
 import matplotlib.pyplot as plt
-
-
-
-
-
-class Load_text_into_2D_array:
-
-
-    def __init__(self):
-
-
-
-
-        self.file_name = str
-
-        self.file_path = str
-
-        self.loaded_array = np.empty([], dtype=np.float32)
-
-
-
-
-    def ask_file_dialog(self):
-
-
-        self.file_path = fd.askopenfilename()
-
-        return self.file_path
-
-
-
-
-    def path_leaf(self):
-
-
-        ntpath.basename("a/b/c")
-
-        head, self.file_name = ntpath.split(self.file_path)
-
-        print(head,  " header")
-
-        print("filename:", self.file_name)
-
-        return self.file_name or ntpath.basename(head)
-
-
-
-
-    def loadarray(self):
-
-        ## Test first - by integers... bla
-    #   reads column1 from txt / skips first rows (3),
-        liste1=np.loadtxt(self.file_path, skiprows=(4), usecols=(0,))
-
-        #reads column2 from txt / skips first rows (3)
-
-        liste=np.loadtxt(self.file_path, skiprows=(4), usecols=(1,))
-        #converts loaded column1 to an numpy array:
-
-        matrix_x = np.array((liste1))
-        #converts loaded column2 to an numpy array:
-
-        matrix_y= np.array((liste))
-
-
-        #joins the arrays into a 2xN array
-        self.loaded_array= np.column_stack((matrix_x, matrix_y))
-
-        self.loaded_array.view('i8,i8').sort(order=['f0'], axis=0)
-
-
-        # Testcase: not empty, no strings or else.... bit number size
-
-        print(self.loaded_array)
-
-        return self.loaded_array
-
 
 
 
@@ -174,6 +97,7 @@ class resize_bins:
         for x in range (0, len(self.test)-1):
 
             if self.test[x] >   self.result_binsize:
+
                 error_switch = False
 
                 #print ("binsize too small")
@@ -184,7 +108,9 @@ class resize_bins:
 
 
             else:
+
                 self.result_binsize = self.result_binsize
+
 
         if error_switch == False:
 
@@ -196,20 +122,20 @@ class resize_bins:
 
                 possible_binsize = np.amax(self.test, axis = 0)
 
-                #print(np.amax(self.test, axis = 0))
-
                 digit = self.find_digit_and_round(float(possible_binsize))
 
                 self.result_binsize = round(float(possible_binsize),digit)
 
-                #print(self.result_binsize)
+                print('set result_binsize.... to: ', self.result_binsize)
 
-                #error_switch = True
+
+
 
         else:
             self.result_binsize = self.result_binsize
 
-        print(self.result_binsize)
+        #print(self.result_binsize, "resulting binsize")
+
         return self.result_binsize
 
 
@@ -222,6 +148,7 @@ class resize_bins:
             print(possible_binsize, "possible minimum binsize = biggest binsize in dataset")
 
         else:
+
            print("minimum do-able binsize (= biggest bin in initial array):", possible_binsize)
            print("start resizing, with resulting binsize of:", self.result_binsize)
 
@@ -233,11 +160,13 @@ class resize_bins:
             case1 = self.delta_bin
 
             if case1 > self.result_binsize:
+
            #print "over bin - case switch"
                 return 0
 
 
             else:
+
              # print "shrink"
                 return 1
 
@@ -261,11 +190,14 @@ class resize_bins:
         self.initial_array[0,0]=round(first_element,x)
 
 #       print "first bin", matrix[0]
+
         i=1
 
         N=len(self.initial_array)
 
         while i<=N:
+
+
             low=self.initial_array[i-1,0]
 
             high = self.initial_array[i,0]
@@ -277,7 +209,9 @@ class resize_bins:
             #print ("neighbor borders", high,low)
 
            # METHOD CALL in class
+
             self.case = self.distance_to_next_bin()
+
             #print(self.case, "case")
 
 
@@ -316,16 +250,15 @@ class resize_bins:
 
 
             elif self.case == 1 and len(self.initial_array)-i>=2:
-                # macht weiter
-                #wahlweise low=matrix[i-1,0]
-                 # arr2 = matrix[i]+matrix[i+1] - matrix[i,0]
+
+
 
                 sum_value=self.initial_array[i,1]+self.initial_array[i+1,1]
 
-                 #print (matrix[i,1],"+",matrix[i+1,1], "=",sum_value)
+                #print (matrix[i,1],"+",matrix[i+1,1], "=",sum_value)
                 self.initial_array[i,1]=sum_value
 
-                shrinked_y=self.initial_array[i+1,0]
+                shrinked_y = self.initial_array[i+1,0]
 
                 self.initial_array[i,0]=shrinked_y
 
@@ -337,9 +270,9 @@ class resize_bins:
 
             else:
 
-                print ("stopp")
+                #print ("stopp")
 
-                print ("letztes bin:", self.delta_bin)
+                #print ("last bin:", self.delta_bin)
 
                 rest = len(self.initial_array)-i
 
@@ -347,7 +280,7 @@ class resize_bins:
 
 
 
-                print (self.restmatrix, "rest matrix")
+                #print (self.restmatrix, "rest matrix")
 
                 restmatrix = self.sum_extracted()
 
@@ -366,9 +299,12 @@ class resize_bins:
 
                 #self.plot_xy("c")
 
-                i=N
+                i = N
 
                 return self.result_matrix
+
+
+
 
     def extract_subarray(self, low, high):
 
@@ -390,6 +326,7 @@ class resize_bins:
 
         while i < N-1:
 
+
             self.restmatrix[i,1] = self.restmatrix[i,1] + self.restmatrix[i+1,1]
 
             self.restmatrix[i,0] = self.restmatrix[i+1,0]
@@ -397,6 +334,7 @@ class resize_bins:
             self.restmatrix = np.delete(self.restmatrix,i+1, 0)
 
             N = len(self.restmatrix)
+
 
         else:
             #print (self.restmatrix)
@@ -407,8 +345,11 @@ class resize_bins:
 
 
     def plot_xy(self, array, colour, marker, label):
+
         x = array[:,0]
+
         y = array[:,1]
+
 
         plt.figure(1)
 
@@ -423,11 +364,14 @@ class resize_bins:
 
 
     def plot_array(self):
+
         self.plot_xy( self.copy_initial, "b", ".", 'initial binning')
+
 
         self.plot_xy(self.result_matrix, "r",  "+", "bin size:"+str(self.result_binsize))
 
         plt.legend()
+
         plt.show()
 
 
@@ -450,21 +394,7 @@ class resize_bins:
     
 
     
-        
 
-
-
-
-#Test1 = Load_text_into_2D_array()
-#Test1.ask_file_dialog()
-#filename = Test1.path_leaf()
-#intial_array = Test1.loadarray()
-
-#resize_me = resize_bins(intial_array, 1.2, filename)
-#resize_me.minimum_bin()
-#resize_me.shrink_subarray()
-#resize_me.plot_array()
-#resize_me.print_to_file()
 
 
 
