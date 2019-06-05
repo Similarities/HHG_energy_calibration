@@ -26,7 +26,11 @@ class resize_bins:
     def __init__(self, initial_array, result_binsize, filename):
 
         self.result_binsize = result_binsize # increment in old version
+        
         self.initial_array = initial_array
+        
+        
+       # print('initial array', self.initial_array.dtype)
         self.copy_initial = np.copy(self.initial_array)
         self.delta_bin = float
         self.case = bool
@@ -37,7 +41,16 @@ class resize_bins:
         self.result_matrix = np.array
         self.filename = filename
 
+        self.rest2 = float
+        self.restx = float
         self.order_ascending()
+
+        self.accuracy = int
+        
+        self.max_x = float
+        self.min_x = float
+        
+        self.ROI_on_result = np.array
 
 
 
@@ -85,6 +98,7 @@ class resize_bins:
         i = 0
 
         error_switch = True
+        
         while i < len(self.initial_array)-2:
 
             self.test[i] = self.initial_array[i+1,0]-self.initial_array[i,0]
@@ -124,7 +138,7 @@ class resize_bins:
 
                 digit = self.find_digit_and_round(float(possible_binsize))
 
-                self.result_binsize = round(float(possible_binsize),digit)
+                self.result_binsize = round(float(possible_binsize),digit)*1.5
 
                 print('set result_binsize.... to: ', self.result_binsize)
 
@@ -185,6 +199,7 @@ class resize_bins:
 
 
 
+        
         first_element=self.initial_array[0,0]
 
         self.initial_array[0,0]=round(first_element,x)
@@ -228,18 +243,20 @@ class resize_bins:
 
                 self.initial_array[i,0] = self.initial_array[i-1,0] + self.result_binsize
 
-                restx = old-self.initial_array[i,0]
+                self.restx = old-self.initial_array[i,0]
 
-                rest2 = (restx/self.result_binsize)*self.initial_array[i,1]
+
+                self.rest2 = (self.restx/self.result_binsize) *self.initial_array[i,1]
+
 
                 #print "rest 2 x und y", restx, rest2
                 #matrix[i,1]=(1-restx)*matrix[i,1]
 
-                self.initial_array[i,1] = self.initial_array[i,1]-rest2
+                self.initial_array[i,1] = self.initial_array[i,1]-self.rest2
 
-                self.initial_array[i+1,1] = self.initial_array[i+1,1]+rest2
+                self.initial_array[i+1,1] = self.initial_array[i+1,1]+self.rest2
 
-                self.initial_array[i+1,0] = self.initial_array[i+1,0]+restx
+                self.initial_array[i+1,0] = self.initial_array[i+1,0]+self.restx
 
                 #print "corrected bin point i+1", matrix[i+1]
                 #print "corrected bin point i", matrix[i]
@@ -288,7 +305,9 @@ class resize_bins:
 
                 self.result_matrix = self.initial_array[0:endbin,0:endbin]
 
-                self.result_matrix = np.concatenate((self.result_matrix,restmatrix))
+                #self.result_matrix = np.concatenate((self.result_matrix,restmatrix))
+
+                self.round_x_axis()
 
                # print_to_file(matrix,self.initial_array)
 
@@ -301,7 +320,18 @@ class resize_bins:
 
                 i = N
 
-                return self.result_matrix
+                #print(self.result_matrix)
+                
+                self.range_of_spectrum()
+
+
+                self.resize_range()
+                
+                #print(len(self.result_matrix), len(self.ROI_on_result))
+
+
+
+                return self.ROI_on_result
 
 
 
@@ -383,6 +413,72 @@ class resize_bins:
         np.savetxt(filename +"_"+"bin_size"+ repr(self.result_binsize)+".txt", self.result_matrix, fmt='%.3E', delimiter='\t')
 
 
+
+
+    def range_of_spectrum(self):
+
+        a = self.result_binsize
+        self.accuracy = self.find_digit_and_round(a)
+
+        self.max_x = round(np.amax(self.result_matrix[:,0]), self.accuracy)
+
+        self.min_x = round(np.amin(self.result_matrix[:,0]), self.accuracy)
+        
+        if self.min_x < 17:
+            self.min_x = 17.5
+            
+        else:
+            
+            self.min_x = self.min_x
+
+
+
+        #print('spectral range', self.max_x, 'to', self.min_x)
+
+        return self.max_x, self.min_x
+    
+    
+    
+    
+    
+    
+    
+    def resize_range(self):
+
+
+        index_up = np.amax(np.where(self.result_matrix[:,0] <= self.max_x))
+        
+        index_down = np.amin(np.where(self.result_matrix[:,0] >= self.min_x))
+        
+
+        
+        
+        #print(index_up,' index up, corresponding to x_max')
+        #print(index_down, " index down, corresponding to x_min'")
+        #print(index_up-index_down, "number of entries after range")
+
+
+        self.ROI_on_result = self.result_matrix[index_down:index_up]
+        #print(self.ROI_on_interpolated)
+
+
+
+
+    def round_x_axis(self):
+
+        for x in range(0,len(self.result_matrix-1)):
+
+            a = self.result_binsize
+
+            self.accuracy = self.find_digit_and_round(a)
+
+            print(self.accuracy, self.result_matrix[x,0])
+
+            temp = self.result_matrix[x,0]
+
+            self.result_matrix[x,0] = round(temp, self.accuracy)
+
+            return self.result_matrix
 
     
 
