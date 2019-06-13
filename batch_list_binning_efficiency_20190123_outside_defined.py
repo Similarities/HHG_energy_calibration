@@ -162,7 +162,10 @@ class batch_images_to_txt:
 
         if len(self.result_binned_array) == len(efficiency_as_array):
 
-            print(self.filename)
+            #print(self.filename)
+
+            self.xlabel = "nm with binsize: "+str(self.result_binsize) + "nm"
+            self.ylabel = "Nphoton"
 
 
 
@@ -229,7 +232,7 @@ class batch_images_to_txt:
         
         self.plot_number = self.plot_number +1
 
-        self.xlabel = 'nm with binning: '+str(self.result_binsize)
+        self.xlabel = 'nm with binning: '+str(self.result_binsize) +"nm"
 
         self.ylabel = "energy [umJ]"
 
@@ -319,8 +322,6 @@ class get_calibration:
     def calc_calibration(self):
 
 
-        self.xlabel = "nm in binning:("+str(self.result_binsize)+")"
-        self.ylabel = "N_photon"
 
 
 
@@ -557,13 +558,16 @@ class Test_data_sets:
 
 file = path_picture + tif_files[0]
 
-wanted_binsize = 0.3
+wanted_binsize = 0.1
 
 
 
 Test = Test_data_sets(wanted_binsize, file)
+
 wanted_binsize = Test.minimum_binsize_possible()
+
 accuracy_decimal = Test.find_digit_and_round()
+
 print("accuracy", accuracy_decimal)
 
 x_max, x_min = Test.return_spectral_range()
@@ -571,9 +575,15 @@ x_max, x_min = Test.return_spectral_range()
 
 print('range of spectrum ', x_min, ' to ', x_max)
 
+
+
+
 cam_file = 'Andor_CCD_gain32.txt'
+
 grating_file = 'grating_efficiency_shimadzu.txt'
+
 filter_file = '200nm_Al_filter.txt'
+
 
 Test.check_calibration_files(cam_file, False)
 cam_file = Test.return_file_path()
@@ -607,9 +617,12 @@ efficiency_as_array = calibration.calc_calibration()
 
 
 print(len(efficiency_as_array))
-my_picture_list=tif_files[58:61]
+
+
 my_picture_list =tif_files[33:36]
+
 how_many_files = len(my_picture_list)
+
 
 #print(how_many_files, 'how many files')
 
@@ -623,15 +636,19 @@ for x in range (0, how_many_files):
     
     
     batch1 = batch_images_to_txt(file, wanted_binsize)
+
     batch1.open_and_integrate()
+
     binsize = batch1.resulting_binsize()
 
+
     temp = batch1.calibrate_my_spectrum(efficiency_as_array)
-    
+
     batch1.plot_my_result(temp)
     
 
     temp2= batch1.convert_to_energy()
+
     batch1.plot_my_result(temp2)
     
 plt.show()
