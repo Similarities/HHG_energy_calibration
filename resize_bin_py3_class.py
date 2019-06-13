@@ -372,7 +372,7 @@ class resize_bins:
             return self.restmatrix
 
 
-
+    # can be deleted... in superclass...
 
     def plot_xy(self, array, colour, marker, label):
 

@@ -100,25 +100,6 @@ class Load_text_into_2D_array:
 
 
 
-
-
-
-def plot_xy(array,colour,name, marker):
-    plt.figure(1)
-    x = array[:,0]
-    y = array[:,1]
-    plt.scatter(x, y, color=colour,label=name, marker = marker)
-    #plt.legend(handles=[plot])
-    plt.ylabel("input")
-    plt.xlabel(("nm ?"))
-    #plt.show()
-
-
-
-
-
-
-
 class Linear_interpolation:
 
     def __init__(self, resulting_binsize, array, filename, accuracy):
@@ -128,6 +109,8 @@ class Linear_interpolation:
         self.initial_array = array
 
         self.filename = filename
+
+        print("filename entering the void", self.filename)
 
         self.delta_x = float(0.)
 
@@ -178,17 +161,20 @@ class Linear_interpolation:
         while i < N-1:
 
             self.delta_x = self.initial_array[i+1]-self.initial_array[i]
+            self.delta_x[0,] = round(self.delta_x[0,], self.accuracy)
 
             #print(self.delta_x[0,])
 
             #print(self.resulting_binsize, 'binsize')
 
-            if self.delta_x[0,] <= self.resulting_binsize:
+            if self.delta_x[0,] < self.resulting_binsize:
                 
-                #print(self.delta_x[0,])
-                #print(self.resulting_binsize)
+                print(self.delta_x[0,], "alias problem found, initial binsize")
+                print(self.resulting_binsize, "resulting binsize")
 
                 i = i #None
+
+
 
 
 
@@ -261,13 +247,22 @@ class Linear_interpolation:
 
                 elif self.x is False:
 
-                    print ("ERROR !!!! resulting_ binsize bigger than input binsize")
+                    print ("initial binsize = wanted binsize for some range")
 
-                    self.error_message()
+                    print(self.delta_x, "initial distance")
+                    print(self.resulting_binsize, "wanted binsize")
+
+                    #self.error_message()
+
+                    print("... there is something wrong, e.g. running into alias problem")
 
                     i = N-1
 
-                    return None
+                    print (self.initial_array)
+
+                    self.temporal_array = self.initial_array
+
+
 
 
             i = i + 1
@@ -286,31 +281,28 @@ class Linear_interpolation:
         #print(self.temporal_array[len(self.temporal_array)-1,], "hezy ho last eintrag")
 
         #print(self.temporal_array, 'result')
+        print(self.filename, "filename now")
 
-
-
-        plt.figure(1)
-
-
-        plot_xy(self.temporal_array,"c",str(self.resulting_binsize), marker = "+",)
-
-        plot_xy(self.initial_array, "r", "input_data", marker = ".")
-
-        plt.title(self.filename)
-
-        plt.legend()
-
-        
-        #plt.savefig(self.filename+ "binned" +".png",  bbox_inches="tight", dpi = 1000)
+        self.plot_xy(self.temporal_array, "g", "output interpolation", 'nm?', 'effiency o.a.', ".")
+        self.plot_xy(self.initial_array, "r", "inital dataset"+self.filename, 'nm?', 'effiency o.a.', "x")
 
         plt.show()
 
 
 
 
+
         return self.temporal_array
     
-    
+    def plot_xy(self, array, colour , name ,xlabel, ylabel, marker):
+        plt.figure(1)
+        x = array[:,0]
+        y = array[:,1]
+        plt.scatter(x, y, color=colour,label=name, marker = marker)
+        plt.legend()
+        plt.ylabel(ylabel)
+        plt.xlabel(xlabel)
+
     
 
     def error_message(self): ##?

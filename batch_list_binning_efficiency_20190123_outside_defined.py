@@ -8,6 +8,7 @@ import os
 
 import time
 
+plt.close()
 
 path_picture = "20190123/"
 
@@ -76,62 +77,11 @@ class batch_images_to_txt:
         
         self.plot_number = 1
 
+        self.xlabel = str
 
+        self.ylabel = str
 
-    def test_on_single_picture(self, path_single):
-
-        # umschreiben mit object ersetzen
-        # like def open_and_integrate(self.filename = bestimmtes argument, dann muss man das nicht doppelt machen.)
-
-        from grating_function_20190123 import Open_and_Plot_Picture
-
-        my_picture_test = Open_and_Plot_Picture(path_picture+path_single, "nm", "counts")
-
-        #print(path_picture+path_single, "filepath to be opened")
-
-        my_picture_test.open_file()
-
-        my_picture_test.integrate_and_plot()
-
-        my_picture_test.background()
-
-        self.my_array = my_picture_test.grating_function()
-        
-
-        self.filename = str(path_single)[:-4]
-
-        print(self.filename, path_single)
-
-
-
-        from resize_bin_py3_class import resize_bins
-
-        my_binned_spectrum_test = resize_bins(self.my_array, self.result_binsize, self.filename )
-
-
-
-        self.result_binsize = my_binned_spectrum_test.minimum_bin()
-
-
-
-        self.result_binned_array = my_binned_spectrum_test.shrink_subarray()
-
-
-
-        self.max_x, self.min_x = my_binned_spectrum_test.range_of_spectrum()
-
-        digit = my_binned_spectrum_test.find_digit_and_round(self.result_binsize)
-
-        self.min_x = round(self.min_x,digit)
-
-        self.max_x = round(self.max_x,digit)
-
-
-
-        print(self.filename, self.max_x, self.min_x)
-
-        # ausserhalb definieren.... muss als festes objekt da sein, nicht temporaer.
-
+        self.plot_legend = str
 
 
 
@@ -146,7 +96,11 @@ class batch_images_to_txt:
         from grating_function_20190123 import Open_and_Plot_Picture
 
 
-        my_picture = Open_and_Plot_Picture(self.file, "nm", "counts")
+        self.xlabel = "nm"
+
+        self.ylabel = "integrated counts"
+
+        my_picture = Open_and_Plot_Picture(self.file, self.xlabel, self.ylabel)
 
         #print(self.file, "filepath to be opened")
 
@@ -158,16 +112,18 @@ class batch_images_to_txt:
 
         self.my_array = my_picture.grating_function()
 
-        self.filename = str(self.file)[10:-4]
+        self.filename = str(self.file)[9:-4]
 
 
 
 
+        # call plot -- might be summarized via the plot call below... 2x!!!!
+        #my_picture.plot_HHG_800nm()
 
-            #my_picture.plot_HHG_800nm()
+
+        #np.savetxt(self.filename[self.numerator - x]+'_binned'+".txt", my_array, delimiter=' ', fmt='%1.4e')   # use exponential notation
 
 
-            #np.savetxt(self.liste[self.numerator - x]+".txt", my_array, delimiter=' ', fmt='%1.4e')   # use exponential notation
 
 
 
@@ -185,9 +141,9 @@ class batch_images_to_txt:
 
         self.max_x, self.min_x = my_binned_spectrum.range_of_spectrum()
 
-            #print(self.filename, self.max_x, self.min_x)
+        #print(self.filename, self.max_x, self.min_x)
 
-        #self.calibrate_my_spectrum(efficiency_as_array)
+
         
         return self.result_binned_array
             
@@ -202,20 +158,12 @@ class batch_images_to_txt:
         
         #print(self.result_binned_array)
 
+
+
         if len(self.result_binned_array) == len(efficiency_as_array):
+
             print(self.filename)
-            
-            #print(self.result_binned_array[10,1],'before')
 
-            #self.calibrated = self.result_binned_array[:,1]*efficiency_as_array[:]
-            
-           # print(efficiency_as_array[-16], 'non empty calibration')
-
-            #print("spectrum with filename", self.filename, " has been calibrated")
-
-            #print(self.calibrated[10], 'calculated')
-            
-            #self.save_to_txt()
 
 
             self.result_binned_array[:,1]= self.result_binned_array[:,1]*efficiency_as_array[:]
@@ -232,18 +180,22 @@ class batch_images_to_txt:
         else:
 
             print("mismatch by overhang bin in length of array")
+
             print(len(self.result_binned_array), 'len my array')
+
             print(len(efficiency_as_array), 'len calibration array')
 
 
-            #print("check accuracy: last entrys")
-            #print(self.result_binned_array[-1,0], "to", self.result_binned_array[1,0])
-
             print("i will now delete last entry")
+
+
 
             if len(efficiency_as_array)> len(self.result_binned_array):
 
+
                 efficiency_as_array = efficiency_as_array[0:-1]
+
+
 
             else:
 
@@ -264,38 +216,54 @@ class batch_images_to_txt:
 
            # print(efficiency_as_array[-1,0], "to", efficiency_as_array[1,0])
 
+            return self.result_binned_array
+
 
 
            
     def convert_to_energy(self):
         
-        self.result_binned_array[:,1] = self.result_binned_array[:,1]*(19.8E-17/self.result_binned_array[:,0])
+        self.result_binned_array[:,1] = self.result_binned_array[:,1]*(19.8E-11/self.result_binned_array[:,0])
         
         self.plot_number = self.plot_number
         
         self.plot_number = self.plot_number +1
-        self.plot_my_result()
-        
-        plt.show()
+
+        self.xlabel = 'nm with binning: '+str(self.result_binsize)
+
+        self.ylabel = "energy [umJ]"
+
+
+
+        return self.result_binned_array
+
+
         
         
         
         
         
 
-    def plot_my_result(self):
+    def plot_my_result(self, array):
         
         
             plt.figure(self.plot_number)
-            plt.plot(self.result_binned_array[:,0], self.result_binned_array[:,1], label=self.filename, marker = '.')
-            plt.xlabel("nm - binsize: "+str(self.result_binsize)+'nm')
-            plt.ylabel("photon number")
+
+            plt.plot(array[:,0], array[:,1], label=self.filename, marker = '.')
+
+            plt.xlabel(self.xlabel)
+
+            plt.ylabel(self.ylabel)
+
             #plt.ylim(0,5.0E8)
+
             plt.title(self.filename)
+
             plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+
             #plt.show()
             
-           # plt.savefig(self.filename+ "binned" +".png",  bbox_inches="tight", dpi = 1000)
+
 
         
         
@@ -307,10 +275,12 @@ class batch_images_to_txt:
         return self.max_x, self.min_x
 
 
+
     def save_to_txt(self):
         
-        np.savetxt(self.filename + "binned_spectrum"+ "_"+"bin_size"+ repr(self.result_binsize)+".txt", self.result_binned_array, fmt='%.3E', delimiter='\t')
-        #print(self.result_binned_array[0:5], self.filename)
+        np.savetxt(self.filename +'_'+ self.xlabel+ "_"+"bin_size"+ repr(self.result_binsize)+'_'+self.ylabel+".txt", self.result_binned_array, fmt='%.3E', delimiter='\t')
+
+
         
         
             
@@ -325,14 +295,23 @@ class batch_images_to_txt:
 
 class get_calibration:
 
-    def __init__(self, wanted_binsize, max_x, min_x, accuracy):
+    def __init__(self, wanted_binsize, max_x, min_x, accuracy, file_path_list):
+
+
+        self.file_path_list = file_path_list
 
         self.result_binsize = wanted_binsize
+
         self.effiency_function = np.array
+
         self.max_x = max_x
+
         self.min_x = min_x
+
         self.lenght = float
+
         self.accuracy = accuracy
+
 
 
 
@@ -340,31 +319,31 @@ class get_calibration:
     def calc_calibration(self):
 
 
+        self.xlabel = "nm in binning:("+str(self.result_binsize)+")"
+        self.ylabel = "N_photon"
+
+
 
         from efficiency_function import calculate_efficiency_function
 
-        function = calculate_efficiency_function(self.min_x, self.max_x, self.result_binsize, self.accuracy)
+        function = calculate_efficiency_function(self.min_x, self.max_x, self.result_binsize, self.accuracy, self.file_path_list)
         
 
 
 
         self.effiency_function= function.get_efficiency_function()
         
-       # self.accuracy = function.return_accuracy()
-       # print(self.accuracy)
+
 
         self.length = (self.max_x - self.min_x)/self.result_binsize
+
+
         self.length = round(self.length,0)
         
         print('amount of bins in range', self.length)
 
         self.test_calculation()
 
-
-
-        #print(self.result_binned_array[::,1]*self.effiency_function[::])
-        #self.effiency_function = np.zeros([len(temp),1])
-        #self.effiency_function[:] = temp[:]
         
 
         return self.effiency_function
@@ -390,24 +369,43 @@ class get_calibration:
 
 
 class Test_data_sets:
+
+
     
     def __init__(self, wanted_binsize, file):
+
+
+
         
         self.resulting_binsize = wanted_binsize
+
         self.min_x = float
+
         self.max_x = float
+
         self.file = file
+
         self.accuracy = int
+
+        self.file_name = file
+
+
+
         
         
     def minimum_binsize_possible(self):
+
+
         
         test_bin = batch_images_to_txt(file, wanted_binsize)
+
         test_bin.open_and_integrate()
+
         self.resulting_binsize = test_bin.resulting_binsize()
-        #
         
         print(self.resulting_binsize, 'binsize used')
+
+
         
         self.min_x, self.max_x = test_bin.return_range_spectrum()
 
@@ -423,20 +421,29 @@ class Test_data_sets:
     def find_digit_and_round(self):
 
         x = 0
+
         first_digit = self.resulting_binsize
+
+
         if first_digit >1:
 
             print("first digit 0.", x, "times" )
+
             return None
+
+
 
         else:
 
             while first_digit <1:
 
+
                 first_digit = first_digit*10
+
                 x = x+1
                 
             self.accuracy = x
+
             
         return self.accuracy
     
@@ -446,23 +453,55 @@ class Test_data_sets:
 
     def return_spectral_range(self):
 
+
         print(self.accuracy, "digit... here")
         
         self.max_x = round(self.max_x,self.accuracy)
+
         self.min_x = round(self.min_x, self.accuracy)
+
         
         return self.min_x, self.max_x
     
     
     
     
-    def check_calibration_files(self, file):
+    def check_calibration_files(self, file, bool):
+
+        self.file_name = file[:-4]
         
         from efficiency_function import Prepare_efficiency_binning
 
         test_file = Prepare_efficiency_binning(self.resulting_binsize, file, self.min_x, self.max_x, self.accuracy)
         
         temp = test_file.open_file()
+
+
+
+        # optional conversion from [eV] into [nm] by bool == False
+
+        if bool == True:
+
+            None
+
+
+        else:
+
+            print("convert from eV into nm for file: ", self.file_name)
+
+            temp = test_file.eV_to_nm()
+
+            header = np.zeros([1,2])
+
+
+            new_calibration_file = np.concatenate((temp, header), axis=0)
+
+            new_calibration_file.view('i8,i8').sort(order=['f0'], axis=0)
+
+            np.savetxt(self.file_name+ "_"+" nm"+ ".txt", new_calibration_file, fmt='%.3E', delimiter='\t')
+
+            self.file_name = self.file_name+ "_"+" nm"+ ".txt"
+
 
 
         
@@ -487,34 +526,38 @@ class Test_data_sets:
         else:
             
             print('filerange sufficient for file', file)
-        
-        
-        
-        #test_file.
-        
-        
-        
 
 
 
 
+    def return_file_path(self):
+
+        return self.file_name
 
 
 
 
 
         
+
         
-# test and get x_max, x_min
+        
 
-#print(tif_files[7], ' bild nummer 1')
 
-# batch_images_to_text(liste,binsize)
+
+
+
+
+
+
+
+        
+        
 
 
 file = path_picture + tif_files[0]
 
-wanted_binsize = 0.2
+wanted_binsize = 0.3
 
 
 
@@ -532,19 +575,24 @@ cam_file = 'Andor_CCD_gain32.txt'
 grating_file = 'grating_efficiency_shimadzu.txt'
 filter_file = '200nm_Al_filter.txt'
 
-Test.check_calibration_files(cam_file)
-Test.check_calibration_files(grating_file)
-Test.check_calibration_files(filter_file)
+Test.check_calibration_files(cam_file, False)
+cam_file = Test.return_file_path()
+
+print("new cam_file", cam_file)
+
+Test.check_calibration_files(grating_file, True)
+Test.check_calibration_files(filter_file, True)
 
 
-
+file_path_list = [cam_file, grating_file, filter_file]
+print(file_path_list, "liste")
 
 
 print(wanted_binsize, "resulting binsiye is now")
 
 
 
-calibration = get_calibration(wanted_binsize, x_max, x_min, accuracy_decimal)
+calibration = get_calibration(wanted_binsize, x_max, x_min, accuracy_decimal, file_path_list)
 
 
 efficiency_as_array = calibration.calc_calibration()
@@ -578,15 +626,16 @@ for x in range (0, how_many_files):
     batch1.open_and_integrate()
     binsize = batch1.resulting_binsize()
 
-    batch1.calibrate_my_spectrum(efficiency_as_array)
+    temp = batch1.calibrate_my_spectrum(efficiency_as_array)
     
-    batch1.plot_my_result()
+    batch1.plot_my_result(temp)
     
 
-    batch1.convert_to_energy()
-    batch1.plot_my_result()
+    temp2= batch1.convert_to_energy()
+    batch1.plot_my_result(temp2)
     
 plt.show()
+#plt.savefig(self.filename+ "binned" +".png",  bbox_inches="tight", dpi = 1000)
 
 
 

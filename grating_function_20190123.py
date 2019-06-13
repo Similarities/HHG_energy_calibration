@@ -40,7 +40,10 @@ class Open_and_Plot_Picture:
 
             self.picture = plt.imread(self.filename)
 
-            #plt.figure(10)
+
+
+
+            # optional plots raw picture.
             #plt.imshow (self.picture, label=self.filedescription)
             #plt.title(self.filedescription, fontdict=None, loc='center', pad=None)
             #plt.legend() #handles=[plot]
@@ -96,6 +99,8 @@ class Open_and_Plot_Picture:
                 i = i+1
             
 
+
+            # optional plots integrated picture
             #print(self.x_axis_in_nm) 
             
             #plt.figure(6) #handles=[plot]
