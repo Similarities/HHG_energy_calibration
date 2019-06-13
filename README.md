@@ -1,14 +1,53 @@
 # batch_lists
 batch_list_all_pics_in_folder 
 
+This project is a further development of the so called 2-frequency binning project. This 
+project now summarizes upsampling and downsampling for non-linear axis scaling. 
+This proceedere is commmonly needed
+when e.g. integrated pictures (spectra) have to be calibrated. Usually the spectra has 
+a non-linear x-scaling, which is a consequence of the grating function. The calibration 
+data set (e.g. measuring the sensitivity of a camera at different photon energies) usually
+contains of less data points with a variable distance (binning) in the x-axis. As long
+as the distance between these data points are much bigger than the binning size we 
+want to achieve in the result: here the linear interpolation helps. 
+In other words, the calibration should be taken place on the basis of array calculation
+instead of fitted analytical functions. The reason lies in the complexity of the calibration
+functions and needed accuracy, for which a fitting routine might lead into sector splitting... or
+polynoms with too high which
+is not what you want to do. So: the exercise is, to bring the calibration array (Nx2) to the
+same dimension as the array that has to be calibrated (Nx2). Here the binning (distance between
+adherent neighbour entry in the x-column) becomes the tricky part.
 
-what it does:
-opens all .tif files from given filepath. 
-(here in this example the array size is fixed to 2048x2048, 16bit pictures, implementation for
-various file formats is still missing)
-our batchlist, treats all pictures in the given folder.
 
-The main programm, tries to evulate the wanted binsize and
+
+what it can do:
+
+- opens and further calculates all .tif files from given filepath (16 bit, 2048x2048) 
+- integrates picture over one dimension
+- takes at the right side of the picture a background, substracts mean value
+- rescales the x- axis according a function (spectrometer function)
+- resizes the x-binning to equi-distant binning (down sampling)
+- needs now 3 calibration files (2 colummn. txt) (e.g. camera, filter, grating)
+- can transfer the calibration x-axis from eV to nm
+- linearly interpolates the calibration files to the same binning as chosem for the picture (upsampling)
+- calculates maximum range (spectrally) from the picture and resizes the calibration range accordingly
+- multiplys the calibration to the integrated picture (spectrum)
+- delivers the option to save separatly each file
+- plots....
+- has some earlier test routine if the sizes of e.g. calibration range is not sufficient
+- has some test routiene if the binning size was chosen too small
+
+
+what it cannot do:
+- stops working if the input binning of the calibration files is smaller than the wanted one
+... here a switch from  upsampling to downsampling would be needed
+- it has no file dialog
+- more testing - in case of alias-boarders
+- a more accurate handling of overhang bins (at the moment just delets and by this shifts one or two)
+- implementation for various file formats 
+
+First the programm takes one (the first) picture from the batchlist and
+assuming the others to be similar in all parameters: tries to evulate the "wanted binsize" and
 in one picture found possible minimum binsize.
 It tests the given calibration files for their spectral range, if 
 sufficient for the range determined in one picture.
