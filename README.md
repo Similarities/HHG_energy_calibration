@@ -1,4 +1,4 @@
-# batch_lists
+# batch_lists: spectral calibration and more
 batch_list_all_pics_in_folder 
 
 This project is a further development of the so called 2-frequency binning project. This 
