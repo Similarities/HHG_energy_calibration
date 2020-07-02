@@ -10,7 +10,7 @@ import time
 
 plt.close()
 
-path_picture = "20190123/"
+path_picture = "rotated20190123/"
 
 save_path = "results/"
 
@@ -326,10 +326,11 @@ class get_calibration:
 
 
         from efficiency_function import calculate_efficiency_function
+        print('XXXXXXXXXXXX')
 
-        function = calculate_efficiency_function(self.min_x, self.max_x, self.result_binsize, self.accuracy, self.file_path_list)
+        function = calculate_efficiency_function(self.min_x, self.max_x, self.result_binsize, self.accuracy)
         
-
+        print('XXXXXXXXXXXXXXXXXXX')
 
 
         self.effiency_function= function.get_efficiency_function()
@@ -619,9 +620,11 @@ efficiency_as_array = calibration.calc_calibration()
 print(len(efficiency_as_array))
 
 
-my_picture_list =tif_files[33:36]
+my_picture_list =tif_files[15:16]
 
 how_many_files = len(my_picture_list)
+
+
 
 
 #print(how_many_files, 'how many files')
@@ -653,6 +656,7 @@ for x in range (0, how_many_files):
     
 plt.show()
 #plt.savefig(self.filename+ "binned" +".png",  bbox_inches="tight", dpi = 1000)
+
 
 
 
