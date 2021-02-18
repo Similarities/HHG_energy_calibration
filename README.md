@@ -10,7 +10,7 @@
 - batch process for images in one folder, over certain energy ranges in one image
 - approximation of Nphoton/sr @ 0.01 band width for picked energy-ranges over batch list
 
-#2-f Binning 'resample'
+[] #2-f Binning 'resample'
 This project is an application of the so called 2-frequency binning method.
 2f binning is commmonly needed
 when e.g. integrated pictures (spectra) have to be calibrated. Usually the spectra has 
