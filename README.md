@@ -1,6 +1,7 @@
 # HHG energy calibration
 - batch calibration for images in a folder
 - 2D background substraction (mean value of either x or y in image)
+- spectral evaluation for y-axis of image according grating function
 - integration of different calibration data (CCD, filter, grating)
 - linear interpolation of calibration data
 - 1/i dependency for spectral energy range to be integrated
