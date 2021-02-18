@@ -10,7 +10,7 @@
 - batch process for images in one folder, over certain energy ranges in one image
 - approximation of Nphoton/sr @ 0.01 band width for picked energy-ranges over batch list
 
-[] #2-f Binning 'resample'
+# 2-f Binning 'resample'
 This project is an application of the so called 2-frequency binning method.
 2f binning is commmonly needed
 when e.g. integrated pictures (spectra) have to be calibrated. Usually the spectra has 
@@ -20,8 +20,14 @@ contains of less data points with a variable distance (binning) in the x-axis.
 In order to do the calibration via broadcasting of arrays, the spectral binning has to be
 same. Hence, calibration data is linearly interpolated, the measured spectra is linearized - 
 in order to achieve the same bin-size width.
+Prerequisite is, in order to avoid subsampling and by this alias or an increase of
+resolution that is not there (Nequist Theorem): the maximum bin-size*1.5* existing in our spectral array limits the resulting
+binsize. The programm checks this, and if the chosen binsize (called self.result_binsize)
+is to small, it will be set automatically to the maximum bin_size x 1.5 of the array (rounded on one digit accuracy).
+After this the x-axis and accordingly the y-axis are redistributed to the new binning range.
 
-what it can do:
+
+# what it can do:
 
 - opens and further calculates all .tif files from given filepath (16 bit, 2048x2048) 
 - integrates picture over one dimension (space)
@@ -37,22 +43,12 @@ what it can do:
 - plots....
 
 
-what is still not catched:
+# what is still not catched:
 - stops working if the input binning of the calibration files is smaller than the wanted one
 - it has no file dialog
 - a more accurate handling of overhang bins (at the moment just delets and by this shifts one or two)
 - code needs some cleaning
-
-
-The so converted picture became an array of DIM 2048x2 which due to the x-axis scaling
-it might now have non-equidistant bins.
-Our converted array is now checked for resizing the binnings to a equidistant ones.
-Prerequisite is, in order to avoid subsampling and by this alias or an increase of
-resolution that is not there: the maximum bin-size*1.5* in our array limits the resulting
-binsize. The programm checks for this, and if the chosen binsize (called self.result_binsize)
-is to small, it will be set automatically to the maximum bin_size of our array (rounded on one digit accuracy).
-After this the x-axis and accordingly the y-axis are redistributed to the new binning range.
-(method description can be found in "2f-binning-III_nonlinear..."- repository. 
+- code needs more tests
 
 
 
