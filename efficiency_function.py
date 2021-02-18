@@ -141,6 +141,8 @@ class calculate_efficiency_function:
     
 
     def __init__(self, min_x, max_x, result_binsize, accuracy):
+        
+
 
         self.max_x = max_x
         self.min_x = min_x
@@ -158,11 +160,6 @@ class calculate_efficiency_function:
         
 
     def get_efficiency_function(self):
-
-        
-        
-        
-
         camera = Prepare_efficiency_binning(self.result_binsize,'Andor_CCD_gain32.txt' , self.min_x, self.max_x, self.accuracy)
         camera.open_file()
         camera.eV_to_nm()
@@ -174,7 +171,7 @@ class calculate_efficiency_function:
        # self.accuracy = camera.return_accuracy()
 
 
-
+        print('sub 001')
 
         grating = Prepare_efficiency_binning(self.result_binsize,'grating_efficiency_shimadzu.txt',self.min_x, self.max_x, self.accuracy)
         grating.open_file()
@@ -182,7 +179,9 @@ class calculate_efficiency_function:
 
         b = grating.resize_range()
 
+    
         print(b, "grating _function")
+        print('sub 002')
         
         
 
@@ -191,6 +190,7 @@ class calculate_efficiency_function:
         Al_filter = Prepare_efficiency_binning(self.result_binsize,'200nm_Al_filter.txt',self.min_x, self.max_x, self.accuracy)
         Al_filter.open_file()
         filter_efficiency_path = Al_filter.interpolate_linear()
+        
         
         
 
@@ -202,18 +202,28 @@ class calculate_efficiency_function:
         
         
         # bad fix for overhang offset has to be improved!!!
-        if len(a)+len(b) != 2* len(c):
+        if len(a) < len(b):
             print('mismatch by overhang')
             
-            c = c[:-1]
+
             b = b[: -1]
             
             print(len(a), " Camera", len(b), "grating", len(c), "Al_filter")
             self.effiency_function= 3.5/(b[::,1]*c[::,1]*a[::,1])
             
-
-        else:
+            
+        elif len(c) == len(a)+1:
+            
+            c = c[:-1]
+            print(len(a), " Camera", len(b), "grating", len(c), "Al_filter")
             self.effiency_function= 3.5/(b[::,1]*c[::,1]*a[::,1])
+            
+
+        elif len(a)+len(b) == 2*len(c):
+            self.effiency_function= 3.5/(b[::,1]*c[::,1]*a[::,1])
+            
+        else: 
+            print('mismatch')
             
 
 
