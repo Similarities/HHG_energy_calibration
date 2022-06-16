@@ -5,7 +5,7 @@ __pycache__/
 
 # C extensions
 *.so
-*.tif
+
 # Distribution / packaging
 .Python
 build/
@@ -103,3 +103,9 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+
+#files data
+/data
+*.tiff
+*.tif
