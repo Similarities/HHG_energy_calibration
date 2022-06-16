@@ -9,7 +9,7 @@ import os
 
 
 plt.close()
-path_picture = "rotated20190123/"
+path_picture = "rotated_20190123/"
 save_path = "results/"
 tif_files = []
 counter = 0
@@ -51,16 +51,11 @@ class batch_images_to_txt:
         self.description = description
         self.energy_content = float
 
-
-
-
-
-
     def integration_unit_conversion(self):
         from grating_function_20190123 import GratingCalculationOnPicture
         self.xlabel = "nm"
         self.ylabel = "integrated counts"
-        my_picture = Open_and_Plot_Picture(self.file, self.xlabel, self.ylabel)
+        my_picture = GratingCalculationOnPicture(self.file, self.xlabel, self.ylabel)
         #print(self.file, "filepath to be opened")
         my_picture.open_file()
         my_picture.integrate_and_background()
@@ -69,7 +64,11 @@ class batch_images_to_txt:
         self.filename = str(self.file)[17:-4]
         self.my_array = self.my_array[10:-20]
         plt.figure(10)
+        plt.title("integrated and spectral calibrated")
         plt.plot(self.my_array[::,0], self.my_array[::,1])
+        plt.xlabel(self.xlabel)
+        plt.ylabel(self.ylabel)
+
         return self.my_array
 
 
@@ -137,11 +136,23 @@ class batch_images_to_txt:
     def return_range_spectrum(self):
         return self.max_x, self.min_x
 
+    def prepare_header(self):
+        # insert header line and change index
+        header_names = (['nm', 'muJ'])
+        names = (['converted file:' + str(self.filename[20:]), "binning:" + str(self.result_binsize)])
+        parameter_info = (
+            ["integrated and resized binned spectra", "ROIsize spatial in px" + str(50) + ":" + str( 1600)])
+
+        return np.vstack((parameter_info, names, header_names, self.result_binned_array))
+
     def save_to_txt(self):
-        print(self.filename, self.description, self.xlabel, self.ylabel)
-        np.savetxt(self.filename[20:] +".txt",
-                   self.result_binned_array, fmt='%.3E', delimiter='\t')
-            
+        result = self.prepare_header()
+        print(result)
+        np.savetxt("20190123" +self.filename[20:] + ".txt", result, delimiter=' ',
+                   header='string', comments='', fmt = '%.s'
+                   )
+
+
     def resulting_binsize(self):
         return self.result_binsize
     
@@ -298,7 +309,7 @@ def file_list_creater(liste_files_by_number, file_name_list):
 
 file = path_picture + tif_files[10]
 
-wanted_binsize = 0.06
+wanted_binsize = 0.1
 
 
 
