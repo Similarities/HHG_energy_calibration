@@ -245,7 +245,7 @@ class Test_data_sets:
             None
         else:
             print("convert from eV into nm for file: ", self.file_name)
-            temp = test_file.eV_to_nm()
+            temp = test_file.nm_to_eV()
             header = np.zeros([1,2])
             new_calibration_file = np.concatenate((temp, header), axis=0)
             new_calibration_file.view('i8,i8').sort(order=['f0'], axis=0)

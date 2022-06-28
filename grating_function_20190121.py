@@ -27,55 +27,45 @@ class GratingCalculationOnPicture:
 
 
         def open_file(self):
-
             self.picture = plt.imread(self.filename)
             return self.picture
 
+
             
         def integrate_and_background(self):
-
             self.integrated = np.sum(self.x_backsubstracted[::, 50:1600], axis = 1)
             self.second_background()
             return self.integrated
 
-
         def second_background(self):
-
             print(len(self.integrated))
             for counter, value in enumerate(self.integrated):
-                self.integrated[counter] = value #+ 250000 + 100*counter
+                self.integrated[counter] = value + 50000 + 200*counter
             return self.integrated
 
 
         def background(self):
-
             back_mean=np.mean(self.picture[:, 1750:1800], axis = 1)
             for counter, value in enumerate(self.x_backsubstracted[::,0]):
-                
                 self.x_backsubstracted[::,counter] = self.picture[::,counter]- (back_mean[counter])
-
             self.integrate_and_background()
             print(np.amin(self.integrated[50:-50]), 'minimum .... after sum')
+
             return self.integrated
-
-
 
         
         def grating_function(self):
-
             N = len(self.integrated)
             i= 0
             while i <= N-1:
-                self.x_axis_in_nm[i] =1.24679344e-06 * i ** 2 - 1.65566701e-02 * i+ 5.22598053e+01
+                self.x_axis_in_nm[i] =1.22447518e-06*i**2 -1.73729829e-02*i+  5.82820234e+01
                 i = i+1
-
             self.array_of_spectrum()
             return self.result_array
 
 
 
         def array_of_spectrum(self):
-
             for x in range(0, len(self.x_axis_in_nm)):
                 self.result_array[x,0] = self.x_axis_in_nm[x]
                 self.result_array[x,1] = self.integrated[x]

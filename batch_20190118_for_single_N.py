@@ -57,7 +57,7 @@ class batch_images_to_txt:
 
 
     def integration_unit_conversion(self):
-        from grating_function_20190118 import GratingCalculationOnPicture
+        from grating_function_20190121 import GratingCalculationOnPicture
         self.xlabel = "nm"
         self.ylabel = "integrated counts"
         my_picture = GratingCalculationOnPicture(self.file, self.xlabel, self.ylabel)
@@ -245,7 +245,7 @@ class Test_data_sets:
             None
         else:
             print("convert from eV into nm for file: ", self.file_name)
-            temp = test_file.eV_to_nm()
+            temp = test_file.nm_to_eV()
             header = np.zeros([1,2])
             new_calibration_file = np.concatenate((temp, header), axis=0)
             new_calibration_file.view('i8,i8').sort(order=['f0'], axis=0)

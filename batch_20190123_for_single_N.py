@@ -8,27 +8,6 @@ import matplotlib.pyplot as plt
 import os
 
 
-plt.close()
-path_picture = "rotated_20190123/"
-save_path = "results/"
-tif_files = []
-counter = 0
-
-
-for file in os.listdir(path_picture):
-    try:
-        if file.endswith(".tif"):
-            tif_files.append(str(file))
-            counter = counter + 1
-        else:
-            print("only other files found")
-    except Exception as e:
-        raise e
-        print("not files found here")
-
-
-print(len(tif_files), "number of files found")
-#np.savetxt("Files"+".txt",tif_files, delimiter='\t')
 
 
 class batch_images_to_txt:
@@ -142,15 +121,17 @@ class batch_images_to_txt:
         names = (['converted file:' + str(self.filename[20:]), "binning:" + str(self.result_binsize)])
         parameter_info = (
             ["integrated and resized binned spectra", "ROIsize spatial in px" + str(50) + ":" + str( 1600)])
-
+    #result binned_array [x,y]
         return np.vstack((parameter_info, names, header_names, self.result_binned_array))
 
     def save_to_txt(self):
         result = self.prepare_header()
-        print(result)
-        np.savetxt("20190123" +self.filename[20:] + ".txt", result, delimiter=' ',
-                   header='string', comments='', fmt = '%.s'
-                   )
+        #print(result)
+        np.savetxt( "20190123" + self.filename[20:-4] + "cal" + ".txt", result, delimiter=' ',
+                   header='string', comments='',
+                   fmt='%s')
+
+
 
 
     def resulting_binsize(self):
@@ -256,10 +237,11 @@ class Test_data_sets:
             None
         else:
             print("convert from eV into nm for file: ", self.file_name)
-            temp = test_file.eV_to_nm()
+            temp = test_file.nm_to_eV()
             header = np.zeros([1,2])
             new_calibration_file = np.concatenate((temp, header), axis=0)
             new_calibration_file.view('i8,i8').sort(order=['f0'], axis=0)
+            #save calibration file
             np.savetxt(self.file_name+ "_"+" nm"+ ".txt", new_calibration_file, fmt='%.3E', delimiter='\t')
             self.file_name = self.file_name+ "_"+" nm"+ ".txt"
 
@@ -302,6 +284,27 @@ def file_list_creater(liste_files_by_number, file_name_list):
 
 
 
+plt.close()
+path_picture = "data/rotated_20190123/"
+save_path = "results/"
+tif_files = []
+counter = 0
+
+
+for file in os.listdir(path_picture):
+    try:
+        if file.endswith(".tif"):
+            tif_files.append(str(file))
+            counter = counter + 1
+        else:
+            print("only other files found")
+    except Exception as e:
+        raise e
+        print("not files found here")
+
+
+print(len(tif_files), "number of files found")
+#np.savetxt("Files"+".txt",tif_files, delimiter='\t')
 
         
         
@@ -310,24 +313,12 @@ def file_list_creater(liste_files_by_number, file_name_list):
 file = path_picture + tif_files[10]
 
 wanted_binsize = 0.1
-
-
-
 Test = Test_data_sets(wanted_binsize, file)
-
 wanted_binsize = Test.minimum_binsize_possible()
-
 accuracy_decimal = Test.find_digit_and_round()
-
 print("accuracy", accuracy_decimal)
-
 x_max, x_min = Test.return_spectral_range()
-
-
 print('range of spectrum ', x_min, ' to ', x_max)
-
-
-
 
 cam_file = 'Andor_CCD_gain32.txt'
 grating_file = 'grating_efficiency_shimadzu.txt'
@@ -380,6 +371,7 @@ for x in range (0, how_many_files):
     temp2= batch1.convert_to_energy()
     #integrated_energy_list.append(my_picture_list[x] + description + str(boundary_high) + str(boundary_Low) + ' :  ')
     #integrated_energy_list.append(batch1.integrate_over_energy(boundary_Low, boundary_high))
+    #single harmonic number evaluation over the stack... resulting index is shotnumber
     integrated_energy_list.append(batch1.integrate_over_energy(boundary_Low, boundary_high))
     batch1.plot_my_result(temp2)
 

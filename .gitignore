@@ -106,7 +106,7 @@ venv.bak/
 
 
 #files data
-/data
+*/data
 *.tiff
 *.tif
 /rotated_20190123
